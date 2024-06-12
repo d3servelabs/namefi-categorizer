@@ -12,6 +12,7 @@ const gwtwc_top_333k = fs.readFileSync(path.resolve(__dirname, './data/gwtwc/cou
         const count = line.split('\t')[1];
         return [word, count];
     });
+
 const gwtwc_count_map = {}; // Google Web Trillion Word Corpus
 gwtwc_top_333k.forEach((pair) => {
     gwtwc_count_map[pair[0]] = pair[1];
