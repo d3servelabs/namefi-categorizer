@@ -1,10 +1,11 @@
 {
     "name": "@namefi/cat",
-    "version": "1.0.0",
+    "version": "1.0.0-beta.2",
     "description": "Namefi Categorizer",
     "homepage": "https://namefi.io",
     "scripts": {
-        "test": "jest"
+        "test": "jest",
+        "build": "tsc"
     },
     
     "engines": {
@@ -22,7 +23,11 @@
         "ts-node": "^10.9.2",
         "typescript": "^5.3.3"
     },
-    "main": "scr/index.ts",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "files": [
+      "dist/**/*"
+    ],
     "author": "Zainan Victor Zhou",
     "license": "MIT",
     "repository": {
