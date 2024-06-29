@@ -6,9 +6,6 @@ import * as fs from 'fs';
 import path from 'path';
 const mit10k_en_us_path = path.resolve(__dirname, './data/mit10k-en-US.txt');
 
-console.log(`XXX __dirname=`, __dirname);
-
-console.log(`XXX mit10k_en_us_path=`, mit10k_en_us_path);
 const mit10k_en_us = fs.readFileSync(mit10k_en_us_path, 'utf8').split('\n');
 const gwtwc_top_333k = fs.readFileSync(path.resolve(__dirname, './data/gwtwc/count_1w.txt'), 'utf8').split('\n')
     .map((line) => {
