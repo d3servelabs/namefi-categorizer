@@ -6,6 +6,7 @@
     "scripts": {
         "test": "jest"
     },
+    
     "engines": {
         "node": ">=18.0.0"
     },
@@ -21,7 +22,7 @@
         "ts-node": "^10.9.2",
         "typescript": "^5.3.3"
     },
-    "main": "jest.config.js",
+    "main": "scr/index.ts",
     "author": "Zainan Victor Zhou",
     "license": "MIT",
     "repository": {
