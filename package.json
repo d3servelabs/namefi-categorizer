@@ -1,11 +1,11 @@
 {
     "name": "@namefi/cat",
-    "version": "1.0.0-beta.2",
+    "version": "1.0.0-beta.3",
     "description": "Namefi Categorizer",
     "homepage": "https://namefi.io",
     "scripts": {
         "test": "jest",
-        "build": "tsc"
+        "build": "tsc && cp -R src/data dist/data"
     },
     
     "engines": {
