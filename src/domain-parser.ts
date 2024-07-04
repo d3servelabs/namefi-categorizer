@@ -1,5 +1,12 @@
 import { parse } from "dotenv";
 
+export enum SupportedTag {
+    IDN_TLD,
+    IDN_SLD,
+    Pure_Number_TLD,
+    Pure_Number_SLD,
+}
+
 export const assertOrFail = function(condition: boolean, message: string) {
     if (!condition) {
         throw new Error(message);
