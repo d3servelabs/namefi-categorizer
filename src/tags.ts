@@ -1,23 +1,3 @@
-/**
- * Tags:
- *  en
- *      - or any 2-letter language code from ISO 639-1)
- *  .com TLD
- *      - or any TLD
- *  Pure Number
- *      - Single Digit Club
- *      - Double Digits Club
- *      - 999 Club
- *      - 10k Club
- *      - 100k Club
- *    ...
- *  English World Club
- *    English Top 1K
- *    English Top 10K
- *    English Top 100K
-*/
-
-import { getPureNumberClub } from "./number-club";
 import { isGwtwc100K, isGwtwc10K, isGwtwc1K } from "./english-word-club";
 import { assertOrFail, extractTopLevelDomain } from "./domain-parser";
 
@@ -111,6 +91,21 @@ export const getTagOfNumberClubFromTagId = (tagId: string): Tag => {
     return getNumTagBySegment(digit);
 }
 
+// Length of child domain tags id child_<length>s
+export const getTagOfLengthOfLastSegment = (length: number): Tag => {
+    return {
+        id: `length_${length}`,
+        name: `Length of last segment: ${length}`,
+        description: `Domain of the length of last segment: ${length}`
+    };
+}
+
+export const getTagOfLengthOfLastSegmentFromTagId = (tagId: string): Tag => {
+    assertOrFail(tagId.startsWith('length_'), 'Invalid tag id');
+    let length = parseInt(tagId.slice(7));
+    return getTagOfLengthOfLastSegment(length);
+}
+
 // english word club tags id  ewc_gwtwc_1k, ewc_gwtwc_10k, ewc_gwtwc_100k
 export const getTagOfEnglishWordClub = (club: string): Tag => {
     let name;
@@ -130,7 +125,7 @@ export const getTagOfEnglishWordClub = (club: string): Tag => {
     }
 
     return {
-        id: `ewc_${club}`,
+        id: `en_${club}`,
         name,
         description: `Domain of the English word club: ${name}`
     };
@@ -154,7 +149,12 @@ export function getTags(domainName: string): Tag[]{
     tags.push(getTagOfTldType(tld));
     
     // Add number club tag
-    tags.push(getNumTagBySegment(firstLDLength));
+    if (firstLDLength > 0 && /^\d+$/.test(firstLD)) {
+        tags.push(getNumTagBySegment(firstLDLength));
+    }
+
+    // Add length of last segment tag
+    tags.push(getTagOfLengthOfLastSegment(firstLDLength));
 
     // Add English word club tag
     if (isGwtwc1K(firstLD)) {
