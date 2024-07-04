@@ -19,54 +19,150 @@
 
 import { getPureNumberClub } from "./number-club";
 import { isGwtwc100K, isGwtwc10K, isGwtwc1K } from "./english-word-club";
+import { assertOrFail, extractTopLevelDomain } from "./domain-parser";
 
-export function getTags(domainName: string) {
-    let tags = [];
-    let segments = domainName.split('.');
+interface Tag {
+    id: string;
+    name: string;
+    description: string;
+}
 
-    // get TLD tag
-    let tld = segments[segments.length - 1];
-    let lld = segments[segments.length - 2];
+// language tags id  lang_en, lang_zh, ... lang_<ISO 639-1>
+/**
+ * Get tag from language code
+ * @param langCode 
+ * @returns 
+ */
+export const getTagOfLangTypeFromLangCode = (langCode: string): Tag => {
+    return {
+        id: `lang_${langCode}`,
+        name: `${langCode} language`,
+        description: `Domain of the language: ${langCode}`
+    };
+}
+export const getTagOfLangFromTagId = (tagId: string): Tag => {
+    assertOrFail(tagId.startsWith('lang_'), 'Invalid tag id');
+    let langCode = tagId.slice(5);
+    return {
+        id: tagId,
+        name: `${langCode} language`,
+        description: `Domain of the language: ${langCode}`
+    };
+}
 
-    tags.push(`.${tld} TLD`);
+// tld tags id  tld_com, tld_net, tld_org, tld_<tld_ldh>
+/**
+ * Get tag from TLD
+ * @param tld 
+ * @returns 
+ */
+export const getTagOfTldType = (tld: string): Tag => {
+    return {
+        id: `tld_${tld}`,
+        name: `.${tld} TLD`,
+        description: `Domain of the TLD: ${tld}`
+    };
+}
 
-    // get leave level domain tag
+export const getTagOfTldFromTagId = (tagId: string): Tag => {
+    assertOrFail(tagId.startsWith('tld_'), 'Invalid tag id');
+    let tld = tagId.slice(4);
+    return {
+        id: tagId,
+        name: `${tld} TLD`,
+        description: `Domain of the TLD: ${tld}`
+    };
+}
 
-    // get number club tag
-    let numberClub = getPureNumberClub(lld);
-    if (numberClub) {
-        tags.push('Pure Number');
-        switch (lld.length) {
-            case 1:
-                tags.push('Single Digit Club');
-                break;
-            case 2:
-                tags.push('Double Digits Club');
-                break;
-            case 3:
-                tags.push('999 Club');
-                break;
-            case 4:
-                tags.push('10k Club');
-                break;
-            case 5:
-                tags.push('100k Club');
-                break;
-        }
+// number club tags id  num_1d, num_2d, num_3d, num_4d, num_<length>d
+export const getNumTagBySegment = (digit: number): Tag => {
+    let name;
+    switch (digit) {
+        case 1:
+            name = 'Single Digit Club';
+            break;
+        case 2:
+            name = 'Double Digit Club';
+            break;
+        case 3:
+            name = '999 Club';
+            break;
+        case 4:
+            name = '10k Club';
+            break;
+        case 5:
+            name = '100k Club';
+            break;
+        default:
+            name = `${digit} Digit Club`;
+            break;
     }
 
-    // get english word club tag
-    if (isGwtwc1K(lld)) {
-        tags.push('English Top 1K');
+    return {
+        id: `num_${digit}d`,
+        name,
+        description: `Domain of the number club: ${digit} digits`
+    };
+}
+
+export const getTagOfNumberClubFromTagId = (tagId: string): Tag => {
+    assertOrFail(tagId.startsWith('num_'), 'Invalid tag id');
+    let digit = parseInt(tagId.slice(4, -1));
+    return getNumTagBySegment(digit);
+}
+
+// english word club tags id  ewc_gwtwc_1k, ewc_gwtwc_10k, ewc_gwtwc_100k
+export const getTagOfEnglishWordClub = (club: string): Tag => {
+    let name;
+    switch (club) {
+        case 'gwtwc_1k':
+            name = 'English Top 1K';
+            break;
+        case 'gwtwc_10k':
+            name = 'English Top 10K';
+            break;
+        case 'gwtwc_100k':
+            name = 'English Top 100K';
+            break;
+        default:
+            name = 'English Word Club';
+            break;
     }
 
-    if (isGwtwc10K(lld)) {
-        tags.push('English Top 10K');
-    }
+    return {
+        id: `ewc_${club}`,
+        name,
+        description: `Domain of the English word club: ${name}`
+    };
+}
 
-    if (isGwtwc100K(lld)) {
-        tags.push('English Top 10K');
-    }
+export const getTagOfEnglishWordClubFromTagId = (tagId: string): Tag => {
+    assertOrFail(tagId.startsWith('ewc_'), 'Invalid tag id');
+    let club = tagId.slice(4);
+    return getTagOfEnglishWordClub(club);
+}
 
+export function getTags(domainName: string): Tag[]{
+    let tags:Tag[] = [];
+    let tld = extractTopLevelDomain(domainName);
+    let firstLD = domainName.split('.')[0];
+    let firstLDLength = firstLD.length;
+
+    // TODO add language tag
+
+    // Add TLD tag
+    tags.push(getTagOfTldType(tld));
+    
+    // Add number club tag
+    tags.push(getNumTagBySegment(firstLDLength));
+
+    // Add English word club tag
+    if (isGwtwc1K(firstLD)) {
+        tags.push(getTagOfEnglishWordClub('gwtwc_1k'));
+    } else if (isGwtwc10K(firstLD)) {
+        tags.push(getTagOfEnglishWordClub('gwtwc_10k'));
+    } else if (isGwtwc100K(firstLD)) {
+        tags.push(getTagOfEnglishWordClub('gwtwc_100k'));
+    }
     return tags;
 }
