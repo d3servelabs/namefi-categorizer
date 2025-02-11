@@ -4,10 +4,12 @@
   "description": "Namefi Categorizer",
   "homepage": "https://namefi.io",
   "scripts": {
-    "test": "jest",
     "build": "tsc && cp -R src/data dist/data",
     "format": "prettier --write .",
-    "lint": "eslint ."
+    "lint:fix": "eslint --fix .",
+    "lint": "eslint .",
+    "test": "jest",
+    "typecheck": "tsc --noEmit"
   },
   "engines": {
     "node": ">=18.0.0"
